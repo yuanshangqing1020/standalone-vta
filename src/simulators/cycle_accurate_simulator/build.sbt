@@ -6,12 +6,12 @@ lazy val commonSettings = Seq(
 )
 
 val chiselVersion = "6.0.0"
-val firrtlVersion = "6.0-SNAPSHOT"
+val firrtlVersion = "6.0.0"
 
 lazy val chiseltestSettings = Seq(
   name := "vta_chiseltest",
   // we keep in sync with chisel version names
-  version := "6.0-SNAPSHOT",
+  version := "6.0.0",
   scalacOptions := Seq(
     "-deprecation",
     "-feature",
@@ -35,7 +35,13 @@ lazy val chiseltestSettings = Seq(
     compilerPlugin(("org.chipsalliance" % "chisel-plugin" % chiselVersion).cross(CrossVersion.full))
   ),
   resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
-  resolvers ++= Resolver.sonatypeOssRepos("releases")
+  resolvers ++= Resolver.sonatypeOssRepos("releases"),
+
+  Test / fork := true,
+  Test / javaOptions ++= Seq(
+    "-Dvta.config.file=vta_config_test.json",
+    "-Dvta.config.fromResources=true"
+  )
 )
 
 lazy val chiseltest = (project in file("."))

@@ -76,7 +76,7 @@ def matrix_partitioning(nb_A=1, A_blocks_col=1, nb_B=1, B_blocks_col=1, nb_X=1, 
     out_block_buffer_size = acc_block_buffer_size
 
     # CASE 1 & 2: MATRIX MULTIPLICATION
-    if (doGemm == True):
+    if (doGemm == True or doMulConstant == True):
         # Check data consistency
         if ( (nb_A%A_blocks_col != 0) or (nb_B%B_blocks_col != 0) or (nb_X%X_blocks_col != 0) ):
             raise Exception(f"ERROR: Data are not consistent: results should be 0 \
@@ -122,7 +122,7 @@ def matrix_partitioning(nb_A=1, A_blocks_col=1, nb_B=1, B_blocks_col=1, nb_X=1, 
 
         # CASE 2: OVERFITTING
         else: # ((nb_A > inp_block_buffer_size) or (nb_B > wgt_block_buffer_size) or (nb_X > out_block_buffer_size))
-            isOverfitting = False
+            isOverfitting = True
 
             # Check if the operations in alu_operations are only vector-scalar
             for alu_ops in alu_operations:
@@ -190,7 +190,7 @@ def matrix_partitioning(nb_A=1, A_blocks_col=1, nb_B=1, B_blocks_col=1, nb_X=1, 
     # CASE 4: ALU OPERATIONS
     else: # doAlu == True
         # Check if it fits
-        if (nb_X < acc_block_buffer_size):
+        if (nb_X <= acc_block_buffer_size):
             isOverfitting = False
             
             # Load all the blocks ([Ai], [Bi], [Xi], [Mi], [Ti], [Ci], [Operations])
@@ -211,8 +211,11 @@ def matrix_partitioning(nb_A=1, A_blocks_col=1, nb_B=1, B_blocks_col=1, nb_X=1, 
             # Sort the alu_operations
             sorted_alu_operations = sort_alu_by_dst(alu_operations)
 
+            # # TODO: TEMPO
+            acc_buffer_size = 11
+
             # Define the strategy
-            strategy = AS.alu_strategy(sorted_alu_ops=sorted_alu_operations, acc_buffer_size=acc_buffer_size)
+            strategy = AS.alu_strategy(sorted_alu_ops=sorted_alu_operations, acc_buffer_size=acc_buffer_size, idx_to_store=idx_to_store)
 
 
     # Debug
@@ -224,7 +227,7 @@ def matrix_partitioning(nb_A=1, A_blocks_col=1, nb_B=1, B_blocks_col=1, nb_X=1, 
             \n ACC=OUT: {out_block_buffer_size} blocks ({out_buffer_size} vectors) \n")
         print(f"The operations are: \n {flag_dict} \n")
         print(f"Number of blocks to load: ")
-        if (doGemm):
+        if (doGemm == True or doMulConstant == True):
             print(f" INP: {nb_A} blocks (including A_blocks_col = {A_blocks_col}), \
             \n WGT: {nb_B} blocks (including B_blocks_col = {B_blocks_col}),")
         print(f" ACC=OUT: {nb_X} blocks (including X_blocks_col = {X_blocks_col}) - {nb_X * block_size} vectors \n")

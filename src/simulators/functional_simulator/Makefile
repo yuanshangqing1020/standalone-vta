@@ -23,6 +23,7 @@
 # Define the compilation option (compiler: gcc, flags: -Wall)
 CC := g++ 
 CFLAGS = -std=c++17 -lstdc++fs -Wall -g
+# CFLAGS = -std=c++17 -lstdc++fs -fsanitize=address -g
 DEBUGFLAG := -DDEBUG_SIM=false
 #-fsanitize=address 
 
@@ -48,6 +49,8 @@ CONFIG_FILES := $(wildcard ../config/*)
 # Build everything
 all: config build/functional_simulator
 
+nn_fsim: build/fsim_nn
+
 # Generate the configuration file log 
 config: build/vta_config_def.txt
 
@@ -61,7 +64,7 @@ compile_only: $(OBJS)
 
 # Link the standalone VTA simulator executable
 build/functional_simulator: build/vta_config_def.txt $(OBJS) lib_tvm
-	$(CC) build/functional_simulator.o build/simulator_functions.o \
+	$(CC) $(CFLAGS) build/functional_simulator.o build/simulator_functions.o \
 	build/virtual_memory.o build/sim_tlpp.o \
 	build/sim_driver.o \
 	$(OBJ_LIB_TVM) -o $@
@@ -69,17 +72,12 @@ build/functional_simulator: build/vta_config_def.txt $(OBJS) lib_tvm
 # 	@echo "Successful link!"
 # 	@echo "To run the executable: ./build/functional_simulator"
 
-# TEMPO
-build/tempo: build/vta_config_def.txt $(OBJS) lib_tvm
-	$(CC) $(VTA_DEFS) $(CFLAGS) -o build/tempo.o -c main_simulator.cc
-	$(CC) build/tempo.o build/simulator_functions.o \
+
+build/fsim_nn: build/vta_config_def.txt $(OBJS) lib_tvm
+	$(CC) $(CFLAGS) build/fsim_nn.o build/simulator_functions.o \
 	build/virtual_memory.o build/sim_tlpp.o \
 	build/sim_driver.o \
 	$(OBJ_LIB_TVM) -o $@
-	@echo
-	@echo "Successful link!"
-tempo: build/tempo
-	build/tempo
 
 
 # COMPILING SIMULATOR AND MAIN FILES (without linking: -c)
@@ -87,6 +85,9 @@ tempo: build/tempo
 # Compile the main file:
 build/functional_simulator.o: src/functional_simulator.cc include/simulator_header.h
 	$(CC) $(VTA_DEFS) $(DEBUGFLAG) $(CFLAGS) -o build/functional_simulator.o -c src/functional_simulator.cc
+
+build/fsim_nn.o: src/fsim_nn.cc include/simulator_header.h
+	$(CC) $(VTA_DEFS) $(DEBUGFLAG) $(CFLAGS) -o build/fsim_nn.o -c src/fsim_nn.cc
 
 # Compile the function file (used by main):
 build/simulator_functions.o: src/simulator_functions.cc include/simulator_header.h
@@ -105,26 +106,12 @@ build/virtual_memory.o: src/virtual_memory.cc include/virtual_memory.h build/vta
 build/reshape.o: src/reshape.cc include/simulator_header.h
 	$(CC) $(VTA_DEFS) $(DEBUGFLAG) $(CFLAGS) -c src/reshape.cc -o build/reshape.o
 
+build/cpu_functions.o: src/cpu_functions.cc include/cpu_functions.h
+	$(CC) $(VTA_DEFS) $(DEBUGFLAG) $(CFLAGS) -c src/cpu_functions.cc -o build/cpu_functions.o
+
 # Generic rules for all in one (require to execute $ make depend)
 #build/%.o: src/%.cc build/vta_config_def.txt
 #	$(CC) $(VTA_DEFS) $(CFLAGS) -o $@ -c $<
-
-# Compile and link lenet5_implementation_simulator:
-build/lenet5_implementation_simulator.o: examples/lenet5_implementation_simulator.cc include/simulator_header.h
-	$(CC) $(VTA_DEFS) $(CFLAGS) -o build/lenet5_implementation_simulator.o -c examples/lenet5_implementation_simulator.cc
-
-
-build/lenet5_implementation_simulator: build/vta_config_def.txt $(OBJS) build/lenet5_implementation_simulator.o build/reshape.o lib_tvm
-	$(CC) build/lenet5_implementation_simulator.o build/simulator_functions.o build/reshape.o \
-	build/virtual_memory.o build/sim_tlpp.o \
-	build/sim_driver.o \
-	$(OBJ_LIB_TVM) -o $@
-	@echo
-	@echo "Successful link of lenet5_implementation_simulator!"
-	@echo "To run the executable: ./build/lenet5_implementation_simulator" 
-
-lenet5: build/lenet5_implementation_simulator src/reshape.cc examples/lenet5_implementation_simulator.cc
-	build/lenet5_implementation_simulator
 
 
 # COMPILING EXTERNAL LIBRARIES
@@ -145,8 +132,12 @@ lib_tvm: $(OBJ_LIB_TVM)
 # --------------
 # EXECUTION AREA
 # --------------
-execute: build/functional_simulator
+execute: 
 	build/functional_simulator
+
+
+nn_execute: 
+	build/fsim_nn
 
 # -------------
 # CONFIGURATION 
@@ -174,7 +165,7 @@ build/others/: | build/
 
 # Clean the build directory
 clean: 
-	find build/ -type f -delete
+	-find build/ -type f -delete
 
 # Generate dependencies
 depend:

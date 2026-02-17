@@ -23,11 +23,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          auto-activate-base: false
+          auto-activate: false
           environment-file: environment_setup/standalone-vta.yml
           activate-environment: standalone-vta
+          channels: conda-forge,defaults
+          channel-priority: flexible
       - name: Tests VTA compiler and functional simulator
-        run: cd examples && make test
+        run: cd examples && make compile_and_run
 
   cycle-accurate-simulator-test:
     runs-on: ubuntu-latest
