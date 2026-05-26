@@ -37,14 +37,13 @@ class GenericTest[T <: Module, P <: PeekPokeTester[T], C <: Parameters](
   ) extends AnyFlatSpec with ChiselScalatestTester {
 
   implicit val p: Parameters = new DefaultPynqConfig
-  val defaultOpts = Seq(TreadleBackendAnnotation)
-  //val verilatorOpts = Seq(VerilatorBackendAnnotation,WriteVcdAnnotation)
+  //val defaultOpts = Seq(TreadleBackendAnnotation,WriteVcdAnnotation)
+  val defaultOpts = Seq(VerilatorBackendAnnotation,WriteVcdAnnotation)
 
   behavior of tag
   if (isLongTest) {
     it should "not have expect violations" taggedAs(LongTests) in {
       test(dutFactory(p)).withAnnotations(defaultOpts).runPeekPoke(testerFactory)
-      //test(dutFactory(p)).withAnnotations(verilatorOpts).runPeekPoke(testerFactory)
     }
   } else {
     it should "not have expect violations" taggedAs(UnitTests) in {

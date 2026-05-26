@@ -93,7 +93,7 @@ class VTAAluInsn(LittleEndianStructure):
 # FUNCTION TO PRINT INSTRUCTION IN HEXADECIMAL
 # --------------------------------------------
 # Print function
-def print_hex_128bit(insn):
+def hex_128bit(insn, debug=False):
     """Print the instruction in hexadecimal (to be used in CHISEL simulation)."""
     # Convert structure in Bytes
     raw_bytes = ctypes.string_at(ctypes.byref(insn), ctypes.sizeof(insn))
@@ -102,7 +102,26 @@ def print_hex_128bit(insn):
     hex_string = raw_bytes[::-1].hex().upper()
 
     # Print group of 8 characters (4 Bytes = 32 bits)
-    print("0x" + " ".join([hex_string[i:i+8] for i in range(0, 32, 8)]))
+    if (debug):
+        print("0x" + " ".join([hex_string[i:i+8] for i in range(0, 32, 8)]))
+    
+    # Return
+    return raw_bytes, hex_string
+
+def hex_32bit(uop, debug=False):
+    """Print the UOP in hexadecimal (to be used in CHISEL simulation)."""
+    # Convert structure in Bytes
+    raw_bytes = ctypes.string_at(ctypes.byref(uop), ctypes.sizeof(uop))
+
+    # Convert Bytes in hexadecimal chain
+    hex_string = raw_bytes[::-1].hex().upper()
+
+    # Print group of 8 characters (4 Bytes = 32 bits)
+    if (debug):
+        print("0x" + " " + hex_string)
+    
+    # Return
+    return raw_bytes, hex_string
 
 
 # INSTRUCTION DECODER
@@ -131,10 +150,40 @@ def decode_vta_insn(hex_string):
         raise ValueError("Unknown opcode")
     
     # Print each field with its value
-    print(f"Instruction type: {insn_type}")
+    print(f"Instruction type: {insn_type} \n\t {hex_string}")
     for field in insn._fields_:
         field_name = field[0]
         field_value = getattr(insn, field_name)
+        if (field_name == "opcode"):
+            if (field_value == 0): field_value = f"{getattr(insn, field_name)} - LOAD"
+            elif (field_value == 1): field_value = f"{getattr(insn, field_name)} - STORE"
+            elif (field_value == 2): field_value = f"{getattr(insn, field_name)} - GEMM"
+            elif (field_value == 3): field_value = f"{getattr(insn, field_name)} - FINISH"
+            elif (field_value == 4): field_value = f"{getattr(insn, field_name)} - ALU"
+        elif (field_name == "buffer_id"):
+            if (field_value == 0): field_value = f"{getattr(insn, field_name)} - UOP"
+            elif (field_value == 1): field_value = f"{getattr(insn, field_name)} - WGT"
+            elif (field_value == 2): field_value = f"{getattr(insn, field_name)} - INP"
+            elif (field_value == 3): field_value = f"{getattr(insn, field_name)} - ACC"
+            elif (field_value == 4): field_value = f"{getattr(insn, field_name)} - OUT"
+        elif (field_name == "sram_base" or field_name == "dram_base"):
+            field_value = f"{getattr(insn, field_name)} - {hex(getattr(insn, field_name))}"
+        print(f"{field_name}: {field_value}")
+
+
+def decode_uop(hex_string):
+    """Decode a given UOP in hexadecimal."""
+    # Convert hexadecimal string to bytes, reversing the order
+    uop_bytes = bytes.fromhex(hex_string.replace(" ", ""))[::-1]
+
+    # Create instances of the UOP
+    uop = VTAUop.from_buffer_copy(uop_bytes)
+    
+    # Print each field with its value
+    print(f"UOP: {hex_string}")
+    for field in uop._fields_:
+        field_name = field[0]
+        field_value = getattr(uop, field_name)
         print(f"{field_name}: {field_value}")
 
 

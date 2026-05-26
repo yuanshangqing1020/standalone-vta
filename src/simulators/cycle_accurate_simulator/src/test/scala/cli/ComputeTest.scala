@@ -23,8 +23,6 @@ class ComputeTest(c: Compute, insn: String, uop: String, input: String, weight: 
 /*************************************************************************************************************
  * TEST EXECUTION
  *************************************************************************************************************/
-//class ComputeApp extends GenericTest("ComputeApp", (p:Parameters) =>
-//  new Compute(true)(p), (c: Compute) => new ComputeTest(c, "/examples_compute/compute_investigation.json", false))
 
 /* Vector x matrix multiplication (Simple Matrix Multiply) */
 class ComputeApp_smm extends GenericTest("ComputeApp_smm", (p:Parameters) =>
@@ -50,20 +48,8 @@ class ComputeApp_16x16 extends GenericTest("ComputeApp_16x16", (p:Parameters) =>
   "examples_compute/16x16/accumulator.bin",
   "examples_compute/16x16/expected_out.bin",
   "examples_compute/16x16/memory_addresses.csv",
+  true,
   true))
-
-///* Matrix 16x16 multiply with matrix 16x16 (WGT and INP are int16) */
-//class ComputeApp_16x16_int16 extends GenericTest("ComputeApp_16x16_int16", (p:Parameters) =>
-//  new Compute(false)(p), (c: Compute) => new ComputeTest(c,
-//  "examples_compute/16x16_int16/instructions.bin",
-//  "examples_compute/16x16_int16/uop.bin",
-//  "examples_compute/16x16_int16/input.bin",
-//  "examples_compute/16x16_int16/weight.bin",
-//  "examples_compute/16x16_int16/out_init.bin",
-//  "examples_compute/16x16_int16/accumulator.bin",
-//  "examples_compute/16x16_int16/expected_out_sram.bin",
-//  "examples_compute/16x16_int16/memory_addresses.csv",
-//  true, debug = true))
 
 /* Matrix 32x32 multiply with matrix 32x32 */
 class ComputeApp_32x32 extends GenericTest("ComputeApp_32x32", (p:Parameters) =>
@@ -78,27 +64,6 @@ class ComputeApp_32x32 extends GenericTest("ComputeApp_32x32", (p:Parameters) =>
   "examples_compute/32x32/memory_addresses.csv",
   true, debug = false, fromResources = true))
 
-
-///* ALTERNATIVE INSTRUCTION INVESTIGATION:
-// * Batches with 2 UOP and 1 GeMM loop */
-//class ComputeApp_Batches_2uop_1loop extends GenericTest("ComputeApp_Batches_2uop_1loop", (p:Parameters) =>
-//  new Compute(true)(p), (c: Compute) => new ComputeTest(c, "/examples_compute/alternative_instructions/batches_2uop_1loop.json", true))
-///* Batches with 1 UOP and 2 GeMM loop */
-//class ComputeApp_Batches_1uop_2loops extends GenericTest("ComputeApp_Batches_1uop_2loops", (p: Parameters) =>
-//  new Compute(true)(p), (c: Compute) => new ComputeTest(c, "/examples_compute/alternative_instructions/batches_1uop_2loops.json", true))
-///* Batches with 2 instructions */
-//class ComputeApp_Batches_2insn extends GenericTest("ComputeApp_Batches_2insn", (p: Parameters) =>
-//  new Compute(true)(p), (c: Compute) => new ComputeTest(c, "/examples_compute/alternative_instructions/batches_2insn.json", true))
-//
-///* ALTERNATIVE INSTRUCTION INVESTIGATION:
-// * Load 4 UOP using 1 instruction */
-//class ComputeApp_LoadUop_1insn extends GenericTest("ComputeApp_LoadUop_1insn", (p: Parameters) =>
-//  new Compute(true)(p), (c: Compute) => new ComputeTest(c, "/examples_compute/alternative_instructions/loadUop_1insn.json"))
-//class ComputeApp_LoadUop_2insn extends GenericTest("ComputeApp_LoadUop_2insn", (p: Parameters) =>
-//  new Compute(true)(p), (c: Compute) => new ComputeTest(c, "/examples_compute/alternative_instructions/loadUop_2insn.json"))
-
-
-//* ALU
 /* ReLU */
 class ComputeApp_relu extends GenericTest("ComputeApp_relu", (p:Parameters) =>
   new Compute(false)(p), (c: Compute) => new ComputeTest(c,
@@ -136,11 +101,8 @@ class ComputeApp_32x32_relu extends GenericTest("ComputeApp_32x32_relu", (p:Para
   "examples_compute/32x32_relu/accumulator.bin",
   "examples_compute/32x32_relu/expected_out.bin",
   "examples_compute/32x32_relu/memory_addresses.csv",
-  true))
-
-///* Average pooling (first part - add only) */
-//class ComputeApp_add_acc_vectors extends GenericTest("ComputeApp_add_acc_vectors", (p: Parameters) =>
-//  new Compute(true)(p), (c: Compute) => new ComputeTest(c, "/examples_compute/compute_add_acc_vectors.json", true))
+  true),
+  true)
 
 /* Average pooling (full - add + division), the division round down */
 class ComputeApp_average_pooling extends GenericTest("ComputeApp_average_pooling", (p:Parameters) =>
@@ -153,9 +115,11 @@ class ComputeApp_average_pooling extends GenericTest("ComputeApp_average_pooling
   "examples_compute/average_pooling/accumulator.bin",
   "examples_compute/average_pooling/expected_out_sram.bin",
   "examples_compute/average_pooling/memory_addresses.csv",
-  true))
+  true),
+  true)
 
-//* CONVOLUTIONAL NEURAL NETWORK:
+
+// LENET-5
 /* LeNet-5: Convolution 1 */
 class ComputeApp_lenet5_conv1 extends GenericTest("ComputeApp_lenet5_conv1", (p:Parameters) =>
   new Compute(true)(p), (c: Compute) => new ComputeTest(c,
@@ -195,5 +159,67 @@ class ComputeApp_lenet5_layer1 extends GenericTest("ComputeApp_lenet5_layer1", (
   "examples_compute/lenet5_layer1/accumulator.bin",
   "examples_compute/lenet5_layer1/expected_out_sram.bin",
   "examples_compute/lenet5_layer1/memory_addresses.csv",
+  true),
+  true)
+
+
+// PERFORMANCE TESTS: 16x16 GeMM
+/* Binaries from VTA compiler */
+class PerfCompute0 extends GenericTest("PerfCompute0_gemm_16x16_vta_compiler", (p:Parameters) =>
+  new Compute(true)(p), (c: Compute) => new ComputeTest(c,
+  "examples_compute/performance_tests/gemm_16x16_vta_compiler/instructions.bin",
+  "examples_compute/performance_tests/gemm_16x16_vta_compiler/uop.bin",
+  "examples_compute/performance_tests/input.bin",
+  "examples_compute/performance_tests/weight.bin",
+  "examples_compute/performance_tests/out_init.bin",
+  "examples_compute/performance_tests/accumulator.bin",
+  "examples_compute/performance_tests/expected_out_sram.bin",
+  "examples_compute/performance_tests/memory_addresses.csv",
+  false,
+  true),
+  true)
+
+/* No reset, No loadAcc, 16 loadUop, 1 loop, 16 UOP */
+class PerfCompute1 extends GenericTest("PerfCompute1_gemm_16x16_with_1loop_16uop_16loaduop", (p:Parameters) =>
+  new Compute(true)(p), (c: Compute) => new ComputeTest(c,
+  "examples_compute/performance_tests/gemm_16x16_with_1loop_16uop_16loaduop/instructions.bin",
+  "examples_compute/performance_tests/gemm_16x16_with_1loop_16uop_16loaduop/uop.bin",
+  "examples_compute/performance_tests/input.bin",
+  "examples_compute/performance_tests/weight.bin",
+  "examples_compute/performance_tests/out_init.bin",
+  "examples_compute/performance_tests/accumulator.bin",
+  "examples_compute/performance_tests/expected_out_sram.bin",
+  "examples_compute/performance_tests/memory_addresses.csv",
+  false,
+  true),
+  true)
+
+/* No reset, No loadAcc, 16 loadUop, 16 loop, 1 UOP */
+class PerfCompute2 extends GenericTest("PerfCompute2_gemm_16x16_with_16loop_1uop_16loaduop", (p:Parameters) =>
+  new Compute(true)(p), (c: Compute) => new ComputeTest(c,
+  "examples_compute/performance_tests/gemm_16x16_with_16loop_1uop_16loaduop/instructions.bin",
+  "examples_compute/performance_tests/gemm_16x16_with_16loop_1uop_16loaduop/uop.bin",
+  "examples_compute/performance_tests/input.bin",
+  "examples_compute/performance_tests/weight.bin",
+  "examples_compute/performance_tests/out_init.bin",
+  "examples_compute/performance_tests/accumulator.bin",
+  "examples_compute/performance_tests/expected_out_sram.bin",
+  "examples_compute/performance_tests/memory_addresses.csv",
+  false,
+  true),
+  true)
+
+/* No reset, No loadAcc, 1 loadUop, 16 loop, 1 UOP */
+class PerfCompute3 extends GenericTest("PerfCompute3_gemm_16x16_with_16loop_1_uop_1loaduop", (p:Parameters) =>
+  new Compute(true)(p), (c: Compute) => new ComputeTest(c,
+  "examples_compute/performance_tests/gemm_16x16_with_16loop_1_uop_1loaduop/instructions.bin",
+  "examples_compute/performance_tests/gemm_16x16_with_16loop_1_uop_1loaduop/uop.bin",
+  "examples_compute/performance_tests/input.bin",
+  "examples_compute/performance_tests/weight.bin",
+  "examples_compute/performance_tests/out_init.bin",
+  "examples_compute/performance_tests/accumulator.bin",
+  "examples_compute/performance_tests/expected_out_sram.bin",
+  "examples_compute/performance_tests/memory_addresses.csv",
+  false,
   true),
   true)

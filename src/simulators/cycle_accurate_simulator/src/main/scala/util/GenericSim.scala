@@ -12,7 +12,8 @@ class GenericSim[T <: Module, P <: PeekPokeTester[T], C <: Parameters](tag : Str
   extends AnyFlatSpec with ChiselScalatestTester {
 
   implicit val p: Parameters = new DefaultPynqConfig
-  val defaultOpts = Seq(TreadleBackendAnnotation)
+  //val defaultOpts = Seq(TreadleBackendAnnotation)
+  val defaultOpts = Seq(VerilatorBackendAnnotation)
 
   behavior of tag
   it should "not have expect violations" in {
