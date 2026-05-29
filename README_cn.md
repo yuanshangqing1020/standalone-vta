@@ -45,7 +45,7 @@ conda activate standalone-vta
 * **sbt**（Scala Build Tool）
 * **Verilator >= 5.x**（CHISEL 生成 Verilog 后仿真）
 
-安装示例见下文「TSIM 环境」；国内使用 sbt 建议配置 Maven 镜像（原 README 中阿里云配置仍适用）。
+完整安装步骤见下文「周期精确仿真器 → TSIM 环境安装」。
 
 ---
 
@@ -155,12 +155,82 @@ sbt "testOnly cli.ComputeApp_lenet5_layer1"
 
 该资源目录已包含 `input.bin`、`weight.bin`、`accumulator.bin`、`memory_addresses.csv`、`expected_out_sram.bin` 等；通常只需替换你新生成的 `uop.bin` / `instructions.bin`。
 
-### TSIM 环境（节选）
+### TSIM 环境安装
+
+周期精确仿真器基于 Scala / CHISEL，首次运行会拉取 Maven 依赖，耗时较长。以下以 **Ubuntu / Debian（含 WSL2）** 为例；其它系统请自行安装等价版本的 JDK 17、sbt、Verilator。
+
+#### 1. Java（JDK 17）
 
 ```bash
 sudo apt update && sudo apt install -y openjdk-17-jdk
-# sbt、Verilator 安装见本文件历史版本或官方文档；Verilator 需 >= 5.x
+
+# 验证
+java -version
+# 应显示 17.x
 ```
+
+#### 2. sbt（Scala Build Tool）
+
+```bash
+echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
+curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add -
+sudo apt update && sudo apt install -y sbt
+
+# 验证
+sbt sbtVersion
+```
+
+**国内网络：** sbt 首次构建常因访问 Maven Central 超时失败，建议配置阿里云镜像：
+
+```bash
+mkdir -p ~/.sbt
+cat > ~/.sbt/repositories << 'EOF'
+[repositories]
+local
+aliyun-central: https://maven.aliyun.com/repository/central
+aliyun-public: https://maven.aliyun.com/repository/public
+aliyun-google: https://maven.aliyun.com/repository/google
+huaweicloud-maven: https://repo.huaweicloud.com/repository/maven/
+scala-sbt-releases: https://repo.scala-sbt.org/scalasbt/maven-releases/
+EOF
+echo 'export SBT_OPTS="-Dsbt.override.build.repos=true"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+#### 3. Verilator（>= 5.x）
+
+CHISEL 仿真会把生成的 Verilog 交给 Verilator 转成 C++ 再编译运行。发行版 apt 中的 Verilator 多为 4.x，**版本过旧**，需从源码安装（约 10～20 分钟）：
+
+```bash
+# 编译依赖
+sudo apt install -y git perl python3 make autoconf g++ flex bison \
+    libfl2 libfl-dev libgoogle-perftools-dev numactl perl-doc \
+    libunwind-dev zlib1g-dev ccache help2man
+
+# 从源码安装（示例版本 v5.020）
+cd ~
+git clone https://github.com/verilator/verilator
+cd verilator
+git checkout v5.020
+autoconf
+./configure
+make -j"$(nproc)"
+sudo make install
+
+# 验证（应 >= 5.0）
+verilator --version
+```
+
+#### 4. 验证 TSIM 能否编译
+
+```bash
+cd standalone-vta/src/simulators/cycle_accurate_simulator
+sbt compile
+```
+
+编译通过后，再执行上文的 `sbt "testOnly cli.ComputeApp_lenet5_layer1"` 或其它 `ComputeApp_*` 测试。
+
+**说明：** 仓库 `examples/Makefile` 中的 `make tsim` 默认调用 `sbt "runMain org.scalatest.run cli.ComputeApp"`，与 `testOnly cli.ComputeApp_lenet5_layer1` 不是同一入口；教程 LeNet-5 第一层请使用后者。
 
 ---
 
