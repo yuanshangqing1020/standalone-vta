@@ -47,7 +47,7 @@ ONNX_FILE ?= onnx/qyolo_pattern.onnx
 # Default
 all: help
 
-view_profiler:
+view_profiler: ## View vta_compiler cProfile report (snakeviz)
 	@snakeviz $(COMPILER_OUTPUT_DIR)/vta_compiler.prof
 
 # NN COMPILER (1st stage compilation)
@@ -89,13 +89,13 @@ fsim_clean: ## Clean FSIM repository
 fsim_compile: ## Compile FSIM
 	cd $(FSIM_DIR) && make build/fsim_nn
 
-fsim_compile_single_layer:
+fsim_compile_single_layer: ## Compile FSIM single-layer binary (build/fsim_single_layer)
 	cd $(FSIM_DIR) && make build/fsim_single_layer
 
 
 # REFERENCE EXECUTION
 #####################
-reference:
+reference: ## ONNX golden reference (REF_MODE=numpy|ort|compare)
 	@echo ""
 	@echo "PROVIDE ONNX reference..."
 	python $(COMPILER_DIR)/reference_computation/reference_onnx.py \
@@ -103,7 +103,7 @@ reference:
 	$(REF_MODE) \
 	$(ONNX_FILE) > $(LOG_OUTPUT_DIR)/prompt_reference.txt
 
-check:
+check: ## Compare FSIM output against reference binaries
 	python $(COMPILER_DIR)/reference_computation/check_bin.py \
 	$(DEBUG) > $(LOG_OUTPUT_DIR)/prompt_checker.txt
 	@echo ""
@@ -121,7 +121,7 @@ fsim_inference: ## Infer FSIM with random values
 	@echo ""
 	@echo "FINAL_OUTPUT.BIN generated!"
 
-fsim_single_layer:
+fsim_single_layer: ## Run FSIM on one layer (reads compiler_output/)
 	@echo ""
 	@echo "RUN functional simulation (for single layer)..."
 	@date
@@ -154,7 +154,7 @@ compile_and_run: ## Compile FSIM and run
 
 # CYCLE ACCURATE TSIM
 #####################
-tsim: # Work only with unamed files (e.g., test_gemm)
+tsim: ## Cycle-accurate TSIM (pairs with test_gemm / single-layer bins)
 	@echo ""
 	@echo "RUN TSIM..."
 	@date
@@ -167,7 +167,7 @@ tsim: # Work only with unamed files (e.g., test_gemm)
 ############################################################
 ############################################################
 
-test_gemm:
+test_gemm: ## 16x16 GEMM: VTA compile + FSIM + TSIM (recommended first run)
 	@make clean
 	@echo "Copy VTA IR in compiler/output"
 	@cp ./vta_ir/matmul_16x16.json $(COMPILER_OUTPUT_DIR)
@@ -187,7 +187,7 @@ test_gemm:
 	@echo "Execute TSIM"
 	@make tsim
 
-test_alu:
+test_alu: ## 16x16 ALU: VTA compile + FSIM + TSIM
 	@make clean
 	@echo "Copy VTA IR in compiler/output"
 	@cp ./vta_ir/alu_16x16.json $(COMPILER_OUTPUT_DIR)
@@ -206,7 +206,7 @@ test_alu:
 	@echo "Execute TSIM"
 	@make tsim
 
-test_bias_expansion:
+test_bias_expansion: ## 32x32 matmul with bias expansion: VTA + FSIM + TSIM
 	@make clean
 	@echo "Copy VTA IR in compiler/output"
 	@cp ./vta_ir/matmul_bias_expansion.json $(COMPILER_OUTPUT_DIR)
@@ -227,7 +227,7 @@ test_bias_expansion:
 	@echo "Execute TSIM"
 	@make tsim
 
-custom_insn:
+custom_insn: ## Emit custom-instruction test artifacts (tests_instructions.py)
 	@python $(COMPILER_DIR)/utils/tests_instructions.py > $(LOG_OUTPUT_DIR)/prompt_vta_compiler.txt
 
 
@@ -257,15 +257,15 @@ force_clean: ## Clean the FSIM directory
 	make clean
 	cd $(FSIM_DIR) && make clean
 
-clean_bin: | $(COMPILER_OUTPUT_DIR) 
+clean_bin: | $(COMPILER_OUTPUT_DIR) ## Remove only *.bin from compiler_output/
 	-rm $(COMPILER_OUTPUT_DIR)/*.bin
-clean_csv: | $(COMPILER_OUTPUT_DIR) 
+clean_csv: | $(COMPILER_OUTPUT_DIR) ## Remove only *.csv from compiler_output/
 	-rm $(COMPILER_OUTPUT_DIR)/*.csv
 
 
 # DEBUG
 #######
-debug: 
+debug: ## Print Makefile path variables (PROJECT_DIR, etc.)
 	@echo "--- PATHS ---"
 	@echo "PROJECT_DIR: $(PROJECT_DIR)"
 	@echo "COMPILER_OUTPUT_DIR: $(COMPILER_OUTPUT_DIR)"
@@ -277,6 +277,8 @@ debug:
 
 # HELP
 ######
-# Return all the possible option for the makefile (must be referenced with ##)
-help:
-	@grep -E '^[a-zA-Z0-9_-]+:.*?##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":[ \t]*##[ \t]*"}; {printf "\033[36m%-24s\033[0m %s\n", $$1, $$2}'
+# Return all documented targets (add "## description" on the target line)
+help: ## List documented make targets
+	@echo "Usage: make <target>   optional: ONNX_FILE=onnx/....onnx"
+	@echo ""
+	@grep -E '^[a-zA-Z0-9_-]+:.*?##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = "##"} {n=$$1; sub(/:.*$$/, "", n); d=$$2; gsub(/^[ \t]+|[ \t]+$$/, "", d); printf "\033[36m%-24s\033[0m %s\n", n, d}'
