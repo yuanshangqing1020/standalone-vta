@@ -167,6 +167,22 @@ tsim: ## Cycle-accurate TSIM (pairs with test_gemm / single-layer bins)
 ############################################################
 ############################################################
 
+# ONNX MODEL GENERATION (examples/onnx/)
+gen_onnx_qconv: ## Generate onnx/qlinearconv_debug.onnx (single QLinearConv)
+	cd onnx && $(PYTHON_CMD) gen_QLinearConv.py
+
+gen_onnx_qmul: ## Generate onnx/qlinearmul_debug.onnx (single QLinearMul)
+	cd onnx && $(PYTHON_CMD) gen_QLinearMul.py
+
+gen_onnx_two_conv: ## Generate onnx/two_qlinearconv_debug.onnx (two QLinearConv)
+	cd onnx && $(PYTHON_CMD) gen_twoQLinearConv.py
+
+gen_onnx_pattern: ## Generate onnx/pattern_debug.onnx (reparam pattern with QLinearAdd)
+	cd onnx && $(PYTHON_CMD) gen_pattern.py
+
+gen_onnx_all: gen_onnx_qconv gen_onnx_qmul gen_onnx_two_conv gen_onnx_pattern ## Generate all debug ONNX models
+
+
 test_gemm: ## 16x16 GEMM: VTA compile + FSIM + TSIM (recommended first run)
 	@make clean
 	@echo "Copy VTA IR in compiler/output"

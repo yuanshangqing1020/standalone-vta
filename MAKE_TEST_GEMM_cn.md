@@ -382,7 +382,7 @@ standalone-vta/
 | 目标 | 输入 | 编译 | 仿真 | 校验 |
 |------|------|------|------|------|
 | **`test_gemm`** | 固定 `vta_ir/matmul_16x16.json` + 随机 bin | VTA 编译器 | FSIM 单层 + TSIM `ComputeApp` | 无 ONNX check |
-| `make run` | ONNX → NN 编译器 → 多层 JSON | VTA + NN | FSIM **整网** `fsim_nn` | `reference` + `check` |
+| `make run` | ONNX → NN 编译器 → 多层 JSON | VTA + NN | FSIM **整网** `fsim_nn` | `reference` + `check`（见 [`MAKE_ONNX_RUN_cn.md`](MAKE_ONNX_RUN_cn.md)） |
 | `tutorials/1.py` | 脚本内嵌算子 | 同类 VTA 编译逻辑 | 文档指引手动 FSIM/TSIM | 教程验证 |
 
 ---
