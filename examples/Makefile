@@ -218,6 +218,8 @@ test_alu: ## 16x16 ALU: VTA compile + FSIM + TSIM
 	@echo ""
 	@echo "Execute FSIM"
 	@make fsim_single_layer
+	@echo "Prepare zero-filled inp/wgt stubs for TSIM (GEMM reset reads SRAM)"
+	@python -c "p=r'$(COMPILER_OUTPUT_DIR)'; open(p+'/input.bin','wb').write(bytes(1024)); open(p+'/weight.bin','wb').write(bytes(1024))"
 	@echo ""
 	@echo "Execute TSIM"
 	@make tsim
