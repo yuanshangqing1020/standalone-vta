@@ -17,6 +17,42 @@ make test_gemm
 ## 1. 总体流程
 
 `test_gemm` 在 `examples/Makefile` 中定义为一条「编排」目标，依次调用 7 个子步骤（含嵌套的 `make`）：
+```bash
+test_gemm: ## 16x16 GEMM: VTA compile + FSIM + TSIM (recommended first run)
+	@make clean
+	@echo "Copy VTA IR in compiler/output"
+	@cp ./vta_ir/matmul_16x16.json $(COMPILER_OUTPUT_DIR)
+	@echo "Generate random data"
+	@python $(COMPILER_DIR)/utils/random_raw_binary_generator.py 16 16 input int32
+	@python $(COMPILER_DIR)/utils/random_raw_binary_generator.py 16 16 weight int32
+	@echo ""
+	@echo "Compile VTA IR"
+	@make vta_compiler
+	@echo ""
+	@echo "Compile FSIM"
+	@make fsim_compile_single_layer
+	@echo ""
+	@echo "Execute FSIM"
+	@make fsim_single_layer
+	@echo ""
+	@echo "Execute TSIM"
+	@make tsim
+
+# VTA COMPILER (2nd stage compilation) 
+##############
+vta_compiler: ## VTA compilation: VTA IRs -> VTA code
+	@echo ""
+	@echo "COMPILE tests..."
+	@date
+	$(PYTHON_CMD) \
+	$(VTA_COMPILER_DIR)/main_vta_compiler.py \
+	$(DEBUG) \
+	$(COMPILE_SUMMARY) \
+	$(DRAM_JSON) \
+	$(CONFIG)/vta_config.json \
+	$(JSON_FILES) > $(LOG_OUTPUT_DIR)/prompt_vta_compiler.txt
+	@date
+```
 
 ```mermaid
 flowchart TD
