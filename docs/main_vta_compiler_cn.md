@@ -382,6 +382,8 @@ main_vta_compiler.py
 
 ## 相关文档
 
+- [`nn_compiler_cn.md`](nn_compiler_cn.md) — 第一阶段 NN 编译器（qONNX → VTA IR）
 - [`MAKE_TEST_GEMM_cn.md`](../MAKE_TEST_GEMM_cn.md) — `make test_gemm` 端到端流程
+- [`vta_config_cn.md`](vta_config_cn.md) — `vta_config.json` 各字段详解
 - [`config/vta_config.json`](../config/vta_config.json) — 默认硬件配置
 - [`compiler_output/matmul_16x16.json`](../compiler_output/matmul_16x16.json) — 16×16 GEMM 示例 VTA IR
