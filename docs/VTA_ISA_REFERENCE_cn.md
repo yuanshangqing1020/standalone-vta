@@ -465,7 +465,7 @@ acc_mem[acc_idx][k] += Σ_{j=0}^{15} inp_mem[inp_idx][j] * wgt_mem[wgt_idx][j, k
 
 ### 12.2 与 Im2Row 大矩阵的关系
 
-大矩阵（如 LeNet-5 的 784×25）先在外部编译阶段分块为 16×16 子块，再通过 **一条或多条 GEMM 宏指令 + 多条 UOP + 嵌套循环** 覆盖全部块索引。这与 Tutorial 1 / `0.py` 中的分块逻辑一致。
+大矩阵（如 LeNet-5 的 784×25）先在外部编译阶段分块为 16×16 子块，再通过 **一条或多条 GEMM 宏指令 + 多条 UOP + 嵌套循环** 覆盖全部块索引。这与 Tutorial 1 / `tutorial1_data_definition.py` 中的分块逻辑一致。
 
 ---
 
@@ -554,7 +554,7 @@ decode_vta_insn("00000000000000000000000000000003")  # FINISH
 
 | 概念 | 教程/脚本 | 指令层 |
 |------|-----------|--------|
-| Im2Row 矩阵 A、B | `tutorials/0.py` Tutorial 1 | 编译后变为 INP/WGT buffer 内容 |
+| Im2Row 矩阵 A、B | `tutorials/tutorial1_data_definition.py` Tutorial 1 | 编译后变为 INP/WGT buffer 内容 |
 | 16×16 分块 | `data_definition.py` | GEMM 每次处理的块 |
 | 矩阵乘 | `A × B` | 一条或多条 **GEMM** 指令 |
 | ReLU | `np.maximum(x, 0)` | **ALU MAX**，imm=0 |
