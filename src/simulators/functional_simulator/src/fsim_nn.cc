@@ -152,10 +152,15 @@ int fsim_nn() {
         std::string fileMetadataPath = construct_path("metadata" + ctx.suffix + ".csv");
         CsvMap metadata_map = load_csv_to_map(fileMetadataPath);
 
+        // 权重矩阵 B（VTA 块转置布局），由 main_vta_compiler 从 IR 中的 B 写出
         std::string fileWgtPath = construct_path("weight" + ctx.suffix + ".bin");
+        // 累加器通道 X 初值（如卷积偏置），对应 metadata 中的矩阵 X / accX
         std::string fileAccPath = construct_path("accumulator" + ctx.suffix + ".bin");
+        // 第二累加器通道 Y（双输入 ALU、残差加等），可为空；对应 metadata 中的矩阵 Y / accY
         std::string fileAddAccPath = construct_path("add_accumulator" + ctx.suffix + ".bin");
+        // VTA 微操作表（UOP），指令流中 LOAD/STORE 等会按索引引用
         std::string fileUopPath = construct_path("uop" + ctx.suffix + ".bin");
+        // VTA 硬件指令流，载入虚拟 DRAM 后 phy_add_insn 作为 VTADeviceRun 取指入口
         std::string fileInsnPath = construct_path("instructions" + ctx.suffix + ".bin");
 
 

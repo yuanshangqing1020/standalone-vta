@@ -2,6 +2,8 @@
 
 本目录提供两个 Jupyter Notebook 及配套 Python 脚本，旨在讲解 standalone-vta 的使用方法，并演示 `standalone-vta/src/compiler/vta_compiler` 中的数据生成与处理流程，以供 `standalone-vta/src/simulators` 使用。
 
+**延伸阅读：** 卷积、GEMM、16×16 分块（tile）与 UOP 的完整原理说明见 [`../docs/gemm_tile_conv原理_cn.md`](../docs/gemm_tile_conv原理_cn.md)。
+
 - [教程 1：数据定义（data_definition）](https://mybinder.org/v2/gh/onera/standalone-vta/main?urlpath=%2Fdoc%2Ftree%2Ftutorials%2Ftutorial1_data_definition.ipynb) — 脚本：[`tutorial1_data_definition.py`](tutorial1_data_definition.py)
 - [教程 2：操作定义（operations_definition）](https://mybinder.org/v2/gh/onera/standalone-vta/main?urlpath=%2Fdoc%2Ftree%2Ftutorials%2Ftutorial2_operations_definition.ipynb) — 脚本：[`tutorial2_operations_definition.py`](tutorial2_operations_definition.py)
 
