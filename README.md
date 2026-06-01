@@ -286,7 +286,10 @@ Or in Python: `from structures import decode_vta_insn, decode_uop` (see [`docs/V
 | [docs/main_vta_compiler_cn.md](docs/main_vta_compiler_cn.md) | Stage-2 VTA compiler (`main_vta_compiler.py`) workflow |
 | [docs/vta_config_cn.md](docs/vta_config_cn.md) | `vta_config.json` field reference |
 | [tutorials/tutorial2_operations_definition.py](tutorials/tutorial2_operations_definition.py) | Tutorial 2 script + **simulator step-by-step commands** (header comments) |
-| [src/simulators/functional_simulator/README.md](src/simulators/functional_simulator/README.md) | FSIM English notes (some commands outdated — prefer this README) |
+| [src/simulators/README_cn.md](src/simulators/README_cn.md) | Simulators overview (Chinese) |
+| [src/simulators/functional_simulator/README_cn.md](src/simulators/functional_simulator/README_cn.md) | FSIM build/run (Chinese) |
+| [docs/fsim_nn与fsim_single_layer_cn.md](docs/fsim_nn与fsim_single_layer_cn.md) | `fsim_nn` vs `fsim_single_layer` (Chinese) |
+| [src/simulators/functional_simulator/README.md](src/simulators/functional_simulator/README.md) | FSIM English (paired with `README_cn.md`) |
 | [docs/VTA_ISA_REFERENCE_cn.md](docs/VTA_ISA_REFERENCE_cn.md) | ISA and pseudocode reference |
 
 ---

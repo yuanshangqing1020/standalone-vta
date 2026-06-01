@@ -282,7 +282,10 @@ python3 structures.py
 | [MAKE_TEST_GEMM_cn.md](MAKE_TEST_GEMM_cn.md) | `make test_gemm` 逐步流程 |
 | [MAKE_ONNX_RUN_cn.md](MAKE_ONNX_RUN_cn.md) | `make run` 与 `examples/onnx/` ONNX 流水线 |
 | [tutorials/tutorial2_operations_definition.py](tutorials/tutorial2_operations_definition.py) | Tutorial 2 脚本 + **模拟器逐步命令**（文件头注释） |
-| [src/simulators/functional_simulator/README.md](src/simulators/functional_simulator/README.md) | FSIM 英文说明（部分命令已过时，以本文为准） |
+| [src/simulators/README_cn.md](src/simulators/README_cn.md) | FSIM / TSIM 仿真器总览 |
+| [src/simulators/functional_simulator/README_cn.md](src/simulators/functional_simulator/README_cn.md) | FSIM 编译、运行与输入文件 |
+| [docs/fsim_nn与fsim_single_layer_cn.md](docs/fsim_nn与fsim_single_layer_cn.md) | `fsim_nn` vs `fsim_single_layer` 详解与仿真器全景 |
+| [src/simulators/functional_simulator/README.md](src/simulators/functional_simulator/README.md) | FSIM 英文说明（与 `README_cn.md` 配套） |
 | [VTA_ISA_REFERENCE_cn.md](VTA_ISA_REFERENCE_cn.md) | ISA 与伪代码 |
 
 ---

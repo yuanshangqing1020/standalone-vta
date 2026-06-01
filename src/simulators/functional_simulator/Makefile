@@ -10,7 +10,8 @@
 # 	'include/': simulator header files
 # 	'config/': VTA simulator configuration files (headers and python scripts)
 # 	'external_lib/': all the dependencies (headers and source files)
-# 	'build/': object files and executable 'vta_simulator'
+# 	'build/': object files and executables 'fsim_single_layer', 'fsim_nn'
+# 	(Legacy name 'vta_simulator' is retired; do not use target 'build/functional_simulator'.)
 
 
 # ###################################################
